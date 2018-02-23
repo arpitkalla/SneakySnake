@@ -2,6 +2,7 @@ import curses
 import numpy as np
 from curses import KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN
 from random import randint
+from nn import Agent
 
 
 class Snake():
@@ -51,7 +52,7 @@ class Snake():
 
         self.snake = [[4,10], [4,9], [4,8]]                                     # Initial snake co-ordinates
         self.food = []                                                          # First food co-ordinates
-
+        self.agent = Agent()
         self.f = open("snake_board.txt","w")
 
     def run(self):
@@ -65,14 +66,20 @@ class Snake():
             self.addstr(self.food[0], self.food[1], '*')
 
             self.win.border(0)
-            self.win.addstr(0, 2, 'Score : ' + str(self.score) + ' ')                # Printing 'Score' and
-            self.win.addstr(0, 27, ' SNAKE ')                                   # 'SNAKE' strings
+            # self.win.addstr(0, 2, 'Score : ' + str(self.score) + ' ')                # Printing 'Score' and
+            # self.win.addstr(0, 27, ' SNAKE ')                                   # 'SNAKE' strings
             self.win.timeout(150 - int(len(self.snake)/5 + len(self.snake)/10)%120)          # Increases the speed of Snake as its length increases
-            self.addstr(0, 2, str('Score : ' + str(self.score) + ' '))
-            self.addstr(0, 27, str(' SNAKE '))
+            # self.addstr(0, 2, str('Score : ' + str(self.score) + ' '))
+            # self.addstr(0, 27, str(' SNAKE '))
 
             prevKey = self.key                                                  # Previous key pressed
-            event = self.win.getch()
+            
+            # Uncomment if want to play as the user
+            # event = self.win.getch()
+
+            # Uncomment when agent plays the game
+            event = self.agent.predict(self.board,self.score)
+
             self.key = self.key if event == -1 else event 
 
 
@@ -91,7 +98,7 @@ class Snake():
             self.snake.insert(0, [self.snake[0][0] + (self.key == KEY_DOWN and 1) + (self.key == KEY_UP and -1), 
                 self.snake[0][1] + (self.key == KEY_LEFT and -1) + (self.key == KEY_RIGHT and 1)])
 
-            # If snake runs over itself
+            # If snake runs over itself  
             if self.snake[0] in self.snake[1:]: break
 
             if self.snake[0] == self.food:                                            # When snake eats the food
